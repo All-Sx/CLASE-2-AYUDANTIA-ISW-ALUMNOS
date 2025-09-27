@@ -17,7 +17,7 @@ export function getPublicProfile(req, res) {
 
 export async function getPrivateProfile(req, res) {
   try {
-    const userId = req.userId; // lo obtengo del middleware JWT
+    const userId = req.userId; 
     const user = await findUserById(userId);
 
     if (!user) {
@@ -58,7 +58,7 @@ export async function updateProfile(req, res) {
 
 export async function deleteProfile(req, res) {
   try {
-    const userId = req.userId; // del token
+    const userId = req.userId;
     await deleteUser(userId);
     handleSuccess(res, 200, "Usuario eliminado exitosamente", { id: userId });
   } catch (error) {
