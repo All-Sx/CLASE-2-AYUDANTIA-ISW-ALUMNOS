@@ -1,13 +1,15 @@
 import { loginUser } from "../services/auth.service.js";
 import { createUser } from "../services/user.service.js";
 import { handleSuccess, handleErrorClient, handleErrorServer } from "../Handlers/responseHandlers.js";
+import { authQueryValidation } from "../validations/auth.validation.js";
 
 export async function login(req, res) {
   try {
     const { email, password } = req.body;
     
-    if (!email || !password) {
-      return handleErrorClient(res, 400, "Email y contraseña son requeridos");
+    const { error } = authQueryValidation.validate({ email, password });
+    if (error) {
+      return handleErrorClient(res, 400, "Parametros invalidos", error.message);
     }
     
     const data = await loginUser(email, password);
@@ -21,8 +23,9 @@ export async function register(req, res) {
   try {
     const data = req.body;
     
-    if (!data.email || !data.password) {
-      return handleErrorClient(res, 400, "Email y contraseña son requeridos");
+    const { error } = authQueryValidation.validate(data);
+    if (error) {
+      return handleErrorClient(res, 400, "Parametros invalidos", error.message);
     }
     
     const newUser = await createUser(data);
