@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../services/auth.service';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -8,7 +9,27 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log({ email, password });
+
+        try {
+            const response = await login({ email, password });
+
+            if (response?.data?.token) {
+            localStorage.setItem('token', response.data.token);
+            navigate('/home');
+            } else {
+            alert('Credenciales inválidas. Por favor, inténtalo de nuevo.');
+            } 
+            }catch (error) {
+                console.error('Error during login:', error);
+
+                if (error.response && error.response.status === 400){
+                    alert('Credenciales inválidas. Por favor, inténtalo de nuevo.');
+                }else if(error.response && error.response.status === 401){
+                    alert('Usuario no autorizado. Por favor, verifica tus credenciales.');
+                }else{
+                    alert('Error del servidor. Por favor, inténtalo más tarde.');
+                }
+        }
     };    return (
         <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 w-full max-w-md transform transition-all hover:scale-105">
