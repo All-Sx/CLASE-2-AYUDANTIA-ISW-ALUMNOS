@@ -58,10 +58,12 @@ export async function updateProfile(req, res) {
 
 export async function deleteProfile(req, res) {
   try {
+    console.log("ID de usuario recibido:", req.userId);
     const userId = req.userId;
     await deleteUser(userId);
     handleSuccess(res, 200, "Usuario eliminado exitosamente", { id: userId });
   } catch (error) {
+    console.error("----- ERROR DETALLADO -----", error);
     if (error.status) {
       return handleErrorClient(res, error.status, error.message);
     }

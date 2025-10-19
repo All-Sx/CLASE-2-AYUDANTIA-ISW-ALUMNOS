@@ -81,11 +81,12 @@ export async function deleteUser(id) {
   await queryRunner.startTransaction();
 
   try {
-    await queryRunner.manager.remove(user);
+    await queryRunner.manager.delete(User, { id: userId });
 
     await queryRunner.commitTransaction();
     return true;
   } catch (err) {
+    console.error("----- ERROR REAL DE LA BASE DE DATOS -----", err);
     await queryRunner.rollbackTransaction();
     if (err.status && err.message) throw err;
     throw { status: 500, message: "Error al eliminar usuario" };

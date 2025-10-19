@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/auth.service';
+import { login, register } from '../services/auth.service';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -30,7 +30,34 @@ const Login = () => {
                     alert('Error del servidor. Por favor, inténtalo más tarde.');
                 }
         }
-    };    return (
+    };    
+    
+    const handleRegister = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await register({email, password});
+
+            if (response?.data) {
+                alert('Registro exitoso.');
+                //Inicio de sesion automatico
+                const loginResponse = await login({ email, password });
+                if (loginResponse?.data?.token) {
+                    localStorage.setItem('token', loginResponse.data.token);
+                    navigate('/home');
+                }
+            }
+        } catch (error) {
+            console.error('Error durante el registro:', error);
+            if (error.response?.status === 400) {
+                alert('El usuario ya existe o los datos no son validos.');
+            } else {
+                alert('Error del servidor. Por favor, inténtalo más tarde.');
+            }
+        }
+    };
+
+    return (
         <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 w-full max-w-md transform transition-all hover:scale-105">
                 <form className="space-y-6" onSubmit={handleSubmit}>
@@ -67,13 +94,21 @@ const Login = () => {
                             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all duration-300"
                         />
                     </div>
-
-                    <button 
-                        type="submit" 
-                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-purple-300"
-                    >
-                        Iniciar sesión
-                    </button>
+                    <div className="flex flex-row space-x-4">
+                        <button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-purple-300"
+                        >
+                            Iniciar sesión
+                        </button>
+                        <button
+                            type="button"
+                            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-purple-300"
+                            onClick={handleRegister}
+                        >
+                            Registrarse
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
